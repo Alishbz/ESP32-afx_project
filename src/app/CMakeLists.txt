@@ -1,5 +1,5 @@
 set(sources
-    src/app_mngr.c
+    src/app_mngr.cpp
 )
 
 idf_component_register(
@@ -14,6 +14,7 @@ idf_component_register(
             nvs_flash
             app_update
             core
+            drv
             json
 )
 

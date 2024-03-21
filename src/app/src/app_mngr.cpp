@@ -11,6 +11,7 @@
 #include "core_includes.h"
 #include "app/app_config.h"
 #include "app/app_types.h"
+#include "drv/VL53L0X.h"
 
 static const char *TAG = "appmngr";
 
@@ -66,6 +67,19 @@ esp_err_t app_start(void)
 #endif
 
     esp_err_t status = ESP_OK;
+
+    /* config */
+#define I2C_PORT I2C_NUM_0
+#define PIN_SDA GPIO_NUM_33
+#define PIN_SCL GPIO_NUM_32
+    /* initialization */
+    VL53L0X vl(I2C_PORT);
+    vl.i2cMasterInit(PIN_SDA, PIN_SCL);
+    if (!vl.init()) {
+        ESP_LOGE(TAG, "Failed to initialize VL53L0X :(");
+        vTaskDelay(portMAX_DELAY);
+    }
+
     ESP_LOGI(TAG, "first init done... status: %d", status);
 
 #ifdef DEBUG_BUILD
