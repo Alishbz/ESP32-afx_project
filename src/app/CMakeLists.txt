@@ -1,5 +1,6 @@
 set(sources
     src/app_mngr.cpp
+    src/tof_mngr.cpp
 )
 
 idf_component_register(

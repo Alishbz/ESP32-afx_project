@@ -1,19 +1,38 @@
+/**
+ * @file app_mngr.cpp
+ * @author Hamza Sengul (hamza.sengul@saykal.com)
+ * @brief
+ * @version 0.1
+ * @date 2024-03-22
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
+/* Standart Library Includes*/
 #include <stdlib.h>
 #include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+
+/* Platform Includes */
 #include "esp_log.h"
+#include "esp_ota_ops.h"
 #include "esp_netif.h"
 #include "esp_event.h"
 #include "nvs_flash.h"
-#include "esp_ota_ops.h"
-#include "cJSON.h"
+
+/* Kernel Includes */
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+/* Core Layer Includes */
 #include "core_includes.h"
+
+/* Application Layer Includes */
 #include "app/app_config.h"
 #include "app/app_types.h"
-#include "drv/VL53L0X.h"
+#include "app/tof_mngr.h"
 
-static const char *TAG = "appmngr";
+static const char *TAG = "app_mngr";
 
 static void app_core_init(void)
 {
@@ -67,20 +86,7 @@ esp_err_t app_start(void)
 #endif
 
     esp_err_t status = ESP_OK;
-
-    /* config */
-#define I2C_PORT I2C_NUM_0
-#define PIN_SDA GPIO_NUM_33
-#define PIN_SCL GPIO_NUM_32
-    /* initialization */
-    VL53L0X vl(I2C_PORT);
-    vl.i2cMasterInit(PIN_SDA, PIN_SCL);
-    if (!vl.init()) {
-        ESP_LOGE(TAG, "Failed to initialize VL53L0X :(");
-        vTaskDelay(portMAX_DELAY);
-    }
-
-    ESP_LOGI(TAG, "first init done... status: %d", status);
+    status |= tof_mngr_init();
 
 #ifdef DEBUG_BUILD
     print_heap_usage("after first init");
