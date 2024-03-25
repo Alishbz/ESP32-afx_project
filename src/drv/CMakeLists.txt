@@ -6,12 +6,14 @@ set(sources
     src/vl53l0x_api.c
     src/vl53l0x_platform_log.c
     src/vl53l0x_platform.c
+    src/rgb_ledc_controller.c
 )
 
 idf_component_register(
     SRCS ${sources}
     INCLUDE_DIRS . inc inc/drv
     REQUIRES 
+            esp_timer
             freertos
             driver
 )
