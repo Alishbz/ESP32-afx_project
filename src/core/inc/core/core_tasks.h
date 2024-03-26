@@ -18,4 +18,13 @@
 #define CORE_TOF_READER_TASK_STACK        (2*KBYTE + CORE_TASK_MIN_STACK)
 #define CORE_TOF_READER_TASK_NAME         "tof_reader_task"
 
+#define CORE_CANBUS_TX_TASK_PRIO         (CORE_TASK_PRIO_MIN + 4)
+#define CORE_CANBUS_TX_TASK_STACK        (4*KBYTE)
+#define CORE_CANBUS_TX_TASK_NAME         "canbus_tx_task"
+
+#define CORE_CANBUS_RX_TASK_PRIO         (CORE_TASK_PRIO_MIN + 4)
+#define CORE_CANBUS_RX_TASK_STACK        (4*KBYTE)
+#define CORE_CANBUS_RX_TASK_NAME         "canbus_rx_task"
+
+
 #endif

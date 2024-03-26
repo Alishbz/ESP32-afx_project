@@ -32,6 +32,7 @@
 #include "app/app_types.h"
 #include "app/tof_mngr.h"
 #include "drv/rgb_ledc_controller.h"
+#include "canbus_mngr.h"
 
 static const char *TAG = "app_mngr";
 
@@ -88,6 +89,7 @@ esp_err_t app_start(void)
 
     esp_err_t status = ESP_OK;
     status |= tof_mngr_init();
+    status |= canbus_mngr_init();
 
 
 // Define the GPIO pins for the Red, Green, and Blue LEDs
