@@ -2,6 +2,7 @@ set(sources
     src/app_mngr.cpp
     src/tof_mngr.cpp
     src/canbus_mngr.c
+    src/rgb_mngr.c
 )
 
 idf_component_register(
