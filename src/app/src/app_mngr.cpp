@@ -44,9 +44,10 @@ static void print_app_info(void)
     esp_app_desc_t app_desc;
     ESP_ERROR_CHECK(esp_ota_get_partition_description(running, &app_desc));
 
-    ESP_LOGI(TAG, "%s %s has started from @%" PRIu32 "",
+    ESP_LOGI(TAG, "%s %s Device ID:%d has started from @%" PRIu32 "",
              app_desc.project_name,
              app_desc.version,
+             DEVICE_ID,
              running->address
             );
 }

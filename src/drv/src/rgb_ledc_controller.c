@@ -148,7 +148,7 @@ static esp_err_t setup_ledc(int led_gpio, ledc_channel_t led_channel)
         .timer_sel = LEDC_TIMER_0
     };
 
-    ledc_fade_func_install(NULL);
+    ledc_fade_func_install(0);
 
     // Set the configuration
     return ledc_channel_config(&ledc_channel_cfg);
@@ -510,7 +510,6 @@ static void transition_effect_callback(void *arg)
 static void breath_effect_callback(void *arg)
 {
     rgb_led_breath_t *breath_data = (rgb_led_breath_t *)arg;
-    esp_err_t ret = ESP_OK;
 
     // Extract the color from the breath effect data
     uint32_t color = breath_data->color;
