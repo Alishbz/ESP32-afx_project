@@ -33,6 +33,7 @@
 /* Application Layer Includes */
 #include "app/app_config.h"
 #include "app/app_types.h"
+#include "app/rgb_mngr.h"
 
 // Define the GPIO pins for the Red, Green, and Blue LEDs
 #define RGB_MNGR_GPIO_LED_RED    (GPIO_NUM_26)
@@ -40,27 +41,45 @@
 #define RGB_MNGR_GPIO_LED_BLUE   (GPIO_NUM_25)
 
 // Define colors as RGB values in hexadecimal
-#define RED     0xFF0000 // Red color
-#define GREEN   0x00FF00 // Green color
-#define BLUE    0x0000FF // Blue color
-#define YELLOW  0xFFFF00 // Yellow color (combination of Red and Green)
-#define VIOLET  0xEE82EE // Violet color
+#define COLOR_NO        0x000000    // No color
+#define COLOR_RED       0xFF0000    // Red color
+#define COLOR_GREEN     0x00FF00    // Green color
+#define COLOR_BLUE      0x0000FF    // Blue color
+#define COLOR_YELLOW    0xFFFF00    // Yellow color (combination of Red and Green)
+#define COLOR_VIOLET    0xEE82EE    // Violet color
 
 static const char *TAG = "rgb_mngr";
 
 static rgb_led_t s_rgb_if = {0};
 
+typedef struct {
+    uint32_t hex_rgb;
+} rgb_color_map_t;
+
+static rgb_color_map_t s_rgb_color_map[RGB_COLOR_MAX] = {
+    {.hex_rgb = COLOR_NO},      /* RGB_NO_COLOR */
+    {.hex_rgb = COLOR_RED},     /* RGB_COLOR_RED */
+    {.hex_rgb = COLOR_GREEN},   /* RGB_COLOR_GREEN */
+    {.hex_rgb = COLOR_BLUE},    /* RGB_COLOR_BLUE */
+    {.hex_rgb = COLOR_YELLOW},  /* RGB_COLOR_YELLOW */
+    {.hex_rgb = COLOR_VIOLET},  /* RGB_COLOR_VIOLET */
+};
+
 /**
- * @brief The function `rgb_mngr_set_color` sets the color of an RGB LED and logs the color value.
+ * @brief The function `rgb_mngr_set_color` sets the color of an RGB LED based on the input color status.
  *
- * @param color It seems like there is a mistake in the code snippet you provided. The `ESP_LOGI`
- * function expects a format specifier for the second argument, but it is missing in the code. To fix
- * this issue, you should provide the format specifier for the `color` argument.
+ * @param color The `color` parameter is of type `rgb_status_t`, which is an enumeration representing
+ * different RGB colors.
  */
-void rgb_mngr_set_color(uint32_t color)
+void rgb_mngr_set_color(rgb_status_t color)
 {
-    ESP_LOGI(TAG, "%s handled! Color is 0x%" PRIu32 "", __func__, color);
-    rgb_led_set_color(&s_rgb_if, color);
+    ESP_LOGI(TAG, "%s handled!", __func__);
+    if (color < RGB_COLOR_MAX) {
+        ESP_LOGI(TAG, "Color status is %d. HEX0x%" PRIu32 "", color, s_rgb_color_map[color].hex_rgb);
+        rgb_led_set_color(&s_rgb_if, s_rgb_color_map[color].hex_rgb);
+    } else {
+        ESP_LOGE(TAG, "Unsegmanted color status: %d", color);
+    }
 }
 
 /**

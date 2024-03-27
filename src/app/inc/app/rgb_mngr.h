@@ -17,14 +17,23 @@
 extern "C" {
 #endif
 
+typedef enum {
+    RGB_NO_COLOR,
+    RGB_COLOR_RED,
+    RGB_COLOR_GREEN,
+    RGB_COLOR_BLUE,
+    RGB_COLOR_YELLOW,
+    RGB_COLOR_VIOLET,
+    RGB_COLOR_MAX,
+} rgb_status_t;
+
 /**
- * @brief The function `rgb_mngr_set_color` sets the color of an RGB LED and logs the color value.
+ * @brief The function `rgb_mngr_set_color` sets the color of an RGB LED based on the input color status.
  *
- * @param color It seems like there is a mistake in the code snippet you provided. The `ESP_LOGI`
- * function expects a format specifier for the second argument, but it is missing in the code. To fix
- * this issue, you should provide the format specifier for the `color` argument.
+ * @param color The `color` parameter is of type `rgb_status_t`, which is an enumeration representing
+ * different RGB colors.
  */
-void rgb_mngr_set_color(uint32_t color);
+void rgb_mngr_set_color(rgb_status_t color);
 
 /**
  * @brief The function `rgb_mngr_init` initializes an RGB LED structure with defined GPIO pins and LEDC

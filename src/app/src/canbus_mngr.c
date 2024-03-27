@@ -31,8 +31,10 @@
 /* Application Layer Includes */
 #include "app/app_config.h"
 #include "app/app_types.h"
+#include "app/rgb_mngr.h"
 
 static const char *TAG = "canbus_mngr";
+
 #define CANBUS_MNGR_TX_PERIOD_MS    (100)
 #define TX_GPIO_NUM                 (0)
 #define RX_GPIO_NUM                 (15)
@@ -108,6 +110,12 @@ static void canbus_tx_task(void *arg)
     vTaskDelete(NULL);
 }
 
+static void canbus_rx_process_command(can_comm_frame_t *can_rx_msg)
+{
+    ESP_LOGW(TAG, "%s handled!", __func__);
+    rgb_mngr_set_color(can_rx_msg->rgb_status.word);
+}
+
 static void canbus_rx_task(void *arg)
 {
     ESP_LOGI(TAG, "%s started!", __func__);
@@ -119,6 +127,7 @@ static void canbus_rx_task(void *arg)
             ESP_LOGI(TAG, "CAN Bus Message sent - Data: [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] ", rx_message.data[0], rx_message.data[1], rx_message.data[2], rx_message.data[3], rx_message.data[4], rx_message.data[5], rx_message.data[6], rx_message.data[7]);
             if (rx_message.data_length_code == sizeof(can_rx_msg)) {
                 memcpy(&can_rx_msg, rx_message.data, rx_message.data_length_code);
+                canbus_rx_process_command(&can_rx_msg);
             }
         }
         vTaskDelay(pdMS_TO_TICKS(10));
