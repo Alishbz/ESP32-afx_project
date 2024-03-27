@@ -13,6 +13,9 @@
 #define CORE_TASK_STACK_TYPE         portSTACK_TYPE
 #define CORE_TASK_SIZE(a)            (sizeof(CORE_TASK_STACK_TYPE)*(a))
 
+#define CORE_APP_STATUS_TASK_PRIO         (CORE_TASK_PRIO_MIN)
+#define CORE_APP_STATUS_TASK_STACK        (2*KBYTE)
+#define CORE_APP_STATUS_TASK_NAME         "app_status_task"
 
 #define CORE_TOF_READER_TASK_PRIO         (CORE_TASK_PRIO_MIN + 4)
 #define CORE_TOF_READER_TASK_STACK        (2*KBYTE + CORE_TASK_MIN_STACK)

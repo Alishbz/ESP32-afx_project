@@ -35,19 +35,7 @@
 #include "app/canbus_mngr.h"
 
 static const char *TAG = "app_mngr";
-
-static void app_core_init(void)
-{
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-}
+#define APP_MAIN_STATUS_TASK_PERIOD_MS      (500)
 
 #ifdef DEBUG_BUILD
 static void print_app_info(void)
@@ -73,6 +61,30 @@ static void print_heap_usage(const char *msg)
 
 #endif
 
+static void app_status_task(void *arg)
+{
+    ESP_LOGI(TAG, "%s started!", __func__);
+    while (pdTRUE) {
+        ESP_LOGI(TAG, "%s handled!", __func__);
+        print_heap_usage("app status:");
+        vTaskDelay(pdMS_TO_TICKS(APP_MAIN_STATUS_TASK_PERIOD_MS));
+    }
+    vTaskDelete(NULL);
+}
+
+static void app_core_init(void)
+{
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+}
+
 esp_err_t app_start(void)
 {
 #ifdef DEBUG_BUILD
@@ -91,6 +103,23 @@ esp_err_t app_start(void)
     status |= tof_mngr_init();
     status |= canbus_mngr_init();
     status |= rgb_mngr_init();
+
+    BaseType_t task_created =  xTaskCreate(app_status_task,
+                                           CORE_APP_STATUS_TASK_NAME,
+                                           CORE_APP_STATUS_TASK_STACK,
+                                           NULL,
+                                           CORE_APP_STATUS_TASK_PRIO,
+                                           NULL);
+    if (task_created != pdPASS) {
+        ESP_LOGE(TAG, "Failed to create %s task.", CORE_APP_STATUS_TASK_NAME);
+        status |= ESP_FAIL;
+    }
+
+    if (status != ESP_OK) {
+        ESP_LOGE(TAG, "first init failed!");
+        return ESP_FAIL;
+    }
+
 
 #ifdef DEBUG_BUILD
     print_heap_usage("after first init");

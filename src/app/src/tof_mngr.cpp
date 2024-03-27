@@ -55,7 +55,7 @@ void tof_reader_task(void *args)
         int took_ms = ((int)tick_end - tick_start) / portTICK_PERIOD_MS;
         if (res) {
             s_result_mm = s_result_mm_tmp;
-            ESP_LOGI(TAG, "Range: %d [mm] took %d [ms]", (int)s_result_mm, took_ms);
+            ESP_LOGD(TAG, "Range: %d [mm] took %d [ms]", (int)s_result_mm, took_ms);
         } else {
             ESP_LOGE(TAG, "Failed to measure.");
         }
@@ -70,7 +70,7 @@ void tof_reader_task(void *args)
  * @return The function `tof_reader_get_range` is returning a `uint16_t` value, which is the result of
  * the variable `s_result_mm`.
  */
-uint16_t tof_reader_get_range(void)
+extern "C" uint16_t tof_reader_get_range(void)
 {
     return s_result_mm;
 }

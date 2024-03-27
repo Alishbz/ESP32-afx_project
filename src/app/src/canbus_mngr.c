@@ -32,19 +32,20 @@
 #include "app/app_config.h"
 #include "app/app_types.h"
 #include "app/rgb_mngr.h"
+#include "app/tof_mngr.h"
 
 static const char *TAG = "canbus_mngr";
 
 #define CANBUS_MNGR_TX_PERIOD_MS    (100)
-#define TX_GPIO_NUM                 (0)
-#define RX_GPIO_NUM                 (15)
-#define TX_TASK_PRIO                (8)       //Sending task priority
-#define RX_TASK_PRIO                (9)       //Receiving task priority
-#define MSG_ID                      (0x111)   //11 bit standard format ID
+#define TX_GPIO_NUM                 (GPIO_NUM_0)
+#define RX_GPIO_NUM                 (GPIO_NUM_15)
+#define CAN_MSG_BASE_ID             (0x100)
+#define CAN_MSG_TX_ID               (CAN_MSG_BASE_ID + DEVICE_ID)       //11 bit standard format ID
+#define CAN_MSG_RX_ID               (2 * CAN_MSG_BASE_ID + DEVICE_ID)   //11 bit standard format ID
 
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
-//Filter all other IDs except MSG_ID
-static const twai_filter_config_t f_config = {.acceptance_code = (MSG_ID << 21),
+//Filter all other IDs except CAN_MSG_RX_ID
+static const twai_filter_config_t f_config = {.acceptance_code = (CAN_MSG_RX_ID << 21),
                                               .acceptance_mask = ~(TWAI_STD_ID_MASK << 21),
                                               .single_filter = true
                                              };
@@ -74,7 +75,7 @@ typedef union {
 } rgb_status_union_t;
 
 typedef struct {
-    float val;
+    uint32_t val;
 } distance_tof_t;
 
 typedef struct {
@@ -86,7 +87,8 @@ typedef struct {
 static void canbus_tx_task(void *arg)
 {
     ESP_LOGI(TAG, "%s started!", __func__);
-    twai_message_t tx_msg = {.data_length_code = 8, .identifier = MSG_ID};
+    twai_message_t tx_msg = {.data_length_code = 8, .identifier = CAN_MSG_TX_ID};
+    uint8_t f_rst_s = 1;
     while (pdTRUE) {
         //twai_start();
 
@@ -95,17 +97,20 @@ static void canbus_tx_task(void *arg)
          *
          */
         can_comm_frame_t can_tx_msg = {0};
-
+        can_tx_msg.state.first_reset = f_rst_s;
+        can_tx_msg.distance.val =   tof_reader_get_range();
         //Transmit messages using self reception request
         memcpy(tx_msg.data, &can_tx_msg, tx_msg.data_length_code);
         if (twai_transmit(&tx_msg, 100) != ESP_OK) {
             ESP_LOGE(TAG, "CAN BUS TX ERROR!");
             twai_clear_transmit_queue();
         } else {
-            ESP_LOGI(TAG, "CAN Bus Message sent - Data: [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] ", tx_msg.data[0], tx_msg.data[1], tx_msg.data[2], tx_msg.data[3], tx_msg.data[4], tx_msg.data[5], tx_msg.data[6], tx_msg.data[7]);
+            ESP_LOGD(TAG, "CAN Bus Message sent - Data: [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] [0x%x] ", tx_msg.data[0], tx_msg.data[1], tx_msg.data[2], tx_msg.data[3], tx_msg.data[4], tx_msg.data[5], tx_msg.data[6], tx_msg.data[7]);
+            /* Clear first reset state */
+            f_rst_s = 0;
         }
         //twai_stop();
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(CANBUS_MNGR_TX_PERIOD_MS));
     }
     vTaskDelete(NULL);
 }
