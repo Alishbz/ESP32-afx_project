@@ -36,6 +36,14 @@ typedef enum {
 void rgb_mngr_set_color(rgb_status_t color);
 
 /**
+ * @brief The function `rgb_mngr_get_color` returns the current RGB status.
+ *
+ * @return The function `rgb_mngr_get_color` is returning a variable of type `rgb_status_t` named
+ * `s_rgb_status`.
+ */
+rgb_status_t rgb_mngr_get_color(void);
+
+/**
  * @brief The function `rgb_mngr_init` initializes an RGB LED structure with defined GPIO pins and LEDC
  * channels, checking for errors during the process.
  *

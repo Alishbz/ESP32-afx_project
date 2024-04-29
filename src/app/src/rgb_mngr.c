@@ -65,6 +65,8 @@ static rgb_color_map_t s_rgb_color_map[RGB_COLOR_MAX] = {
     {.hex_rgb = COLOR_VIOLET},  /* RGB_COLOR_VIOLET */
 };
 
+static rgb_status_t s_rgb_status = 0;
+
 /**
  * @brief The function `rgb_mngr_set_color` sets the color of an RGB LED based on the input color status.
  *
@@ -77,9 +79,21 @@ void rgb_mngr_set_color(rgb_status_t color)
     if (color < RGB_COLOR_MAX) {
         ESP_LOGI(TAG, "Color status is %d. HEX0x%" PRIu32 "", color, s_rgb_color_map[color].hex_rgb);
         rgb_led_set_color(&s_rgb_if, s_rgb_color_map[color].hex_rgb);
+        s_rgb_status = color;
     } else {
         ESP_LOGE(TAG, "Unsegmanted color status: %d", color);
     }
+}
+
+/**
+ * @brief The function `rgb_mngr_get_color` returns the current RGB status.
+ *
+ * @return The function `rgb_mngr_get_color` is returning a variable of type `rgb_status_t` named
+ * `s_rgb_status`.
+ */
+rgb_status_t rgb_mngr_get_color(void)
+{
+    return s_rgb_status;
 }
 
 /**

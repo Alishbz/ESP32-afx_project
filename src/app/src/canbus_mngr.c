@@ -45,8 +45,8 @@ static const char *TAG = "canbus_mngr";
 
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
 //Filter all other IDs except CAN_MSG_RX_ID
-static const twai_filter_config_t f_config = {.acceptance_code = (CAN_MSG_RX_ID << 21),
-                                              .acceptance_mask = ~(TWAI_STD_ID_MASK << 21),
+static const twai_filter_config_t f_config = {.acceptance_code = (CAN_MSG_RX_ID << 3),
+                                              .acceptance_mask = ~(TWAI_EXTD_ID_MASK << 3),
                                               .single_filter = true
                                              };
 //Set to NO_ACK mode due to self testing with single module
@@ -57,22 +57,24 @@ typedef union {
         uint16_t current_error : 1;
         uint16_t software_error : 1;
         uint16_t first_reset : 1;
-        uint16_t reserved : 13;
+        uint16_t distance_out_range_error : 1;
+        uint16_t reserved : 12;
     };
     uint16_t word;
 } state_union_t;
 
 typedef union {
     struct {
-        uint16_t no_color : 1;
-        uint16_t red : 1;
-        uint16_t green : 1;
-        uint16_t blue : 1;
-        uint16_t yellow : 1;
-        uint16_t reserved : 11;
+        uint16_t go_to_reset : 1;
+        uint16_t reserved : 15;
     };
     uint16_t word;
-} rgb_status_union_t;
+} command_state_union_t;
+
+typedef struct {
+    uint8_t status;
+    uint8_t reserved;
+} rgb_state_t;
 
 typedef struct {
     uint32_t val;
@@ -80,14 +82,14 @@ typedef struct {
 
 typedef struct {
     state_union_t state;
-    rgb_status_union_t rgb_status;
+    rgb_state_t rgb;
     distance_tof_t distance;
 } __attribute__((packed)) can_comm_frame_t;
 
 static void canbus_tx_task(void *arg)
 {
     ESP_LOGI(TAG, "%s started!", __func__);
-    twai_message_t tx_msg = {.data_length_code = 8, .identifier = CAN_MSG_TX_ID};
+    twai_message_t tx_msg = {.data_length_code = 8, .identifier = CAN_MSG_TX_ID, .extd = 1};
     uint8_t f_rst_s = 1;
     while (pdTRUE) {
         //twai_start();
@@ -98,7 +100,9 @@ static void canbus_tx_task(void *arg)
          */
         can_comm_frame_t can_tx_msg = {0};
         can_tx_msg.state.first_reset = f_rst_s;
-        can_tx_msg.distance.val =   tof_reader_get_range();
+        can_tx_msg.rgb.status   = rgb_mngr_get_color();
+        can_tx_msg.distance.val = tof_reader_get_range();
+        can_tx_msg.state.distance_out_range_error = tof_reader_get_error();
         //Transmit messages using self reception request
         memcpy(tx_msg.data, &can_tx_msg, tx_msg.data_length_code);
         if (twai_transmit(&tx_msg, 100) != ESP_OK) {
@@ -118,7 +122,12 @@ static void canbus_tx_task(void *arg)
 static void canbus_rx_process_command(can_comm_frame_t *can_rx_msg)
 {
     ESP_LOGW(TAG, "%s handled!", __func__);
-    rgb_mngr_set_color(can_rx_msg->rgb_status.word);
+    rgb_mngr_set_color(can_rx_msg->rgb.status);
+    command_state_union_t state = {0};
+    state.word = can_rx_msg->state.word;
+    if (state.go_to_reset) {
+        esp_restart();
+    }
 }
 
 static void canbus_rx_task(void *arg)

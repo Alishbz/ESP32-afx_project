@@ -42,6 +42,7 @@ static const char *TAG = "tof_mngr";
 #define TOF_MNGR_READ_POLLING_PERIOD_MS (10)
 
 static uint16_t s_result_mm = 0;
+static uint16_t s_read_error = 0;
 static VL53L0X vl(I2C_PORT);
 
 void tof_reader_task(void *args)
@@ -55,8 +56,10 @@ void tof_reader_task(void *args)
         int took_ms = ((int)tick_end - tick_start) / portTICK_PERIOD_MS;
         if (res) {
             s_result_mm = s_result_mm_tmp;
+            s_read_error = 0;
             ESP_LOGD(TAG, "Range: %d [mm] took %d [ms]", (int)s_result_mm, took_ms);
         } else {
+            s_read_error = 1;
             ESP_LOGE(TAG, "Failed to measure.");
         }
         vTaskDelay(pdMS_TO_TICKS(TOF_MNGR_READ_POLLING_PERIOD_MS));
@@ -73,6 +76,18 @@ void tof_reader_task(void *args)
 extern "C" uint16_t tof_reader_get_range(void)
 {
     return s_result_mm;
+}
+
+/**
+ * @brief The function `tof_reader_get_error` returns the error code stored in the variable
+ * `s_read_error`.
+ *
+ * @return The function `tof_reader_get_error` is returning a `uint16_t` value, which is the
+ * error code stored in the variable `s_read_error`.
+ */
+extern "C" uint16_t tof_reader_get_error(void)
+{
+    return s_read_error;
 }
 
 /**

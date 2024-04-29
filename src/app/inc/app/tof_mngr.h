@@ -25,6 +25,16 @@ extern "C" {
  * the variable `s_result_mm`.
  */
 uint16_t tof_reader_get_range(void);
+
+/**
+ * @brief The function `tof_reader_get_error` returns the error code stored in the variable
+ * `s_read_error`.
+ *
+ * @return The function `tof_reader_get_error` is returning a `uint16_t` value, which is the
+ * error code stored in the variable `s_read_error`.
+ */
+uint16_t tof_reader_get_error(void);
+
 #ifdef __cplusplus
 }
 #endif
