@@ -42,11 +42,23 @@
 
 // Define colors as RGB values in hexadecimal
 #define COLOR_NO        0x000000    // No color
-#define COLOR_RED       0xFF0000    // Red color
-#define COLOR_GREEN     0x00FF00    // Green color
-#define COLOR_BLUE      0x0000FF    // Blue color
-#define COLOR_YELLOW    0xFFFF00    // Yellow color (combination of Red and Green)
-#define COLOR_VIOLET    0xEE82EE    // Violet color
+#define COLOR_RED       0xd33235    // Red color
+#define COLOR_GREEN     0x319b07    // Green color
+#define COLOR_BLUE      0x237b9     // Blue color
+#define COLOR_WHITE     0xfcfaf9
+#define COLOR_74        0x74e072
+#define COLOR_F4        0x74e072
+#define COLOR_B2        0xb26a1e
+#define COLOR_FF        0xffc1f8
+#define COLOR_77        0x77efdf
+#define COLOR_F2        0xf2ff68
+#define COLOR_AF        0xafd0ff
+#define COLOR_EA        0xea4d77
+#define COLOR_95        0x95f759
+#define COLOR_3E        0x3ea2ef
+#define COLOR_68        0x686ed6
+#define COLOR_E9        0xe9f9ff
+
 
 static const char *TAG = "rgb_mngr";
 
@@ -61,8 +73,19 @@ static rgb_color_map_t s_rgb_color_map[RGB_COLOR_MAX] = {
     {.hex_rgb = COLOR_RED},     /* RGB_COLOR_RED */
     {.hex_rgb = COLOR_GREEN},   /* RGB_COLOR_GREEN */
     {.hex_rgb = COLOR_BLUE},    /* RGB_COLOR_BLUE */
-    {.hex_rgb = COLOR_YELLOW},  /* RGB_COLOR_YELLOW */
-    {.hex_rgb = COLOR_VIOLET},  /* RGB_COLOR_VIOLET */
+    {.hex_rgb = COLOR_WHITE },
+    {.hex_rgb = COLOR_74    },
+    {.hex_rgb = COLOR_F4    },
+    {.hex_rgb = COLOR_B2    },
+    {.hex_rgb = COLOR_FF    },
+    {.hex_rgb = COLOR_77    },
+    {.hex_rgb = COLOR_F2    },
+    {.hex_rgb = COLOR_AF    },
+    {.hex_rgb = COLOR_EA    },
+    {.hex_rgb = COLOR_95    },
+    {.hex_rgb = COLOR_3E    },
+    {.hex_rgb = COLOR_68    },
+    {.hex_rgb = COLOR_E9    }
 };
 
 static rgb_status_t s_rgb_status = 0;

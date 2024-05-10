@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(EXTRA_COMPONENT_DIRS src)
 
-set(DEVICE_ID 1)
+set(DEVICE_ID 8)
 message("\r\n-- DEVICE_ID:" ${DEVICE_ID})
 set(application_name "esp32_canrgb")
 set(application_version "0.0.2")
@@ -12,6 +12,7 @@ set(application_version "0.0.2")
 set(PROJECT_VER ${application_version}_D${DEVICE_ID})
 add_definitions(-DDEVICE_ID=${DEVICE_ID})
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+add_definitions(-DDEBUG_BUILD)
 
 # idf.py -DCMAKE_BUILD_TYPE=Debug reconfigure
 # idf.py -DCMAKE_BUILD_TYPE=Release reconfigure
