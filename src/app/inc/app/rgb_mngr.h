@@ -18,13 +18,24 @@ extern "C" {
 #endif
 
 typedef enum {
-    RGB_NO_COLOR,
+    RGB_COLOR_NO,
     RGB_COLOR_RED,
     RGB_COLOR_GREEN,
     RGB_COLOR_BLUE,
-    RGB_COLOR_YELLOW,
-    RGB_COLOR_VIOLET,
-    RGB_COLOR_MAX,
+    RGB_COLOR_WHITE,
+    RGB_COLOR_74,
+    RGB_COLOR_F4,
+    RGB_COLOR_B2,
+    RGB_COLOR_FF,
+    RGB_COLOR_77,
+    RGB_COLOR_F2,
+    RGB_COLOR_AF,
+    RGB_COLOR_EA,
+    RGB_COLOR_95,
+    RGB_COLOR_3E,
+    RGB_COLOR_68,
+    RGB_COLOR_E9,
+    RGB_COLOR_MAX
 } rgb_status_t;
 
 /**
