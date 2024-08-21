@@ -1,5 +1,5 @@
 set(sources
-
+    src/file_mngr.c
 )
 
 idf_component_register(
@@ -9,4 +9,6 @@ idf_component_register(
             esp_timer
             esp_lcd
             driver
+            spiffs
+
 )

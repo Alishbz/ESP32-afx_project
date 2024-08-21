@@ -26,13 +26,16 @@
 
 /* Core Layer Includes */
 #include "core_includes.h"
+#include "core/file_mngr.h"
 
 /* Application Layer Includes */
 #include "app/app_config.h"
 #include "app/app_types.h"
 #include "app/tof_mngr.h"
-#include "app/rgb_mngr.h"
+//#include "app/rgb_mngr.h"
 #include "app/canbus_mngr.h"
+#include "app/wifi_mngr.h"
+#include "app/rest_server_mngr.h"
 
 static const char *TAG = "app_mngr";
 #define APP_MAIN_STATUS_TASK_PERIOD_MS      (500)
@@ -84,6 +87,17 @@ static void app_core_init(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(file_mngr_init(APP_CONFIG_FILE_BASE_PATH));
+    file_mngr_get_fs_used_size(APP_CONFIG_FILE_BASE_PATH);
+    ESP_ERROR_CHECK(file_mngr_init(APP_WEB_SERVER_ROOT_PATH));
+    if (!file_mngr_get_fs_used_size(APP_WEB_SERVER_ROOT_PATH)) {
+        ESP_LOGE(TAG, "%s partition found but, not used. Web server files missing!", APP_WEB_SERVER_ROOT_PATH);
+        ESP_LOGE(TAG, "System will restart in 2 seconds.");
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        esp_restart();
+    }
+    file_list_dir_path(APP_CONFIG_FILE_BASE_PATH);
+    file_list_dir_path(APP_WEB_SERVER_ROOT_PATH);
 }
 
 esp_err_t app_start(void)
@@ -101,10 +115,11 @@ esp_err_t app_start(void)
 #endif
 
     esp_err_t status = ESP_OK;
-    status |= tof_mngr_init();
-    status |= canbus_mngr_init();
-    status |= rgb_mngr_init();
-
+    //status |= tof_mngr_init();
+    //status |= canbus_mngr_init();
+    //status |= rgb_mngr_init();
+    wifi_init_softap();
+    rest_stack_init();
     BaseType_t task_created =  xTaskCreate(app_status_task,
                                            CORE_APP_STATUS_TASK_NAME,
                                            CORE_APP_STATUS_TASK_STACK,

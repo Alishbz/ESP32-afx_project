@@ -6,10 +6,10 @@ set(EXTRA_COMPONENT_DIRS src)
 
 set(DEVICE_ID 8)
 message("\r\n-- DEVICE_ID:" ${DEVICE_ID})
-set(application_name "esp32_canrgb")
-set(application_version "0.0.2")
+set(application_name "ESP32_AFD_CTL")
+set(application_version "0.0.3")
 
-set(PROJECT_VER ${application_version}_D${DEVICE_ID})
+set(PROJECT_VER ${application_version})
 add_definitions(-DDEVICE_ID=${DEVICE_ID})
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 add_definitions(-DDEBUG_BUILD)
